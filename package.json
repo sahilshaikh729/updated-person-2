@@ -1,0 +1,43 @@
+{
+  "name": "sih-disaster-response-ground-station",
+  "version": "1.0.0",
+  "description": "SIH Disaster-Response Drone System - Person 2 Ground Station & Backend",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev:backend": "node backend/server.js",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "mock": "node mock/event_generator/generator.js",
+    "mock:stream": "node mock/event_generator/generator.js --stream --interval 4000",
+    "bridge:lora": "node bridge/lora_bridge.js",
+    "bridge:lora:sim": "node bridge/lora_bridge.js --simulate",
+    "bridge:lora:py": "python bridge/lora_bridge.py",
+    "test:merge": "node mock/event_generator/generator.js --test-merge",
+    "test:duplicate": "node mock/event_generator/generator.js --test-duplicate",
+    "setup": "npm install && cd frontend && npm install"
+  },
+  "keywords": [
+    "drone",
+    "disaster-response",
+    "ground-station",
+    "emergency",
+    "lora",
+    "wifi",
+    "sih"
+  ],
+  "author": "Person 2",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "serialport": "^13.0.0",
+    "sqlite3": "^5.1.7",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

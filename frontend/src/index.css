@@ -1,0 +1,138 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Tactical Dark Palette */
+  --color-bg: #060911;
+  --color-panel: rgba(11, 16, 26, 0.9);
+  --color-panel-border: rgba(255, 255, 255, 0.08);
+  --color-panel-hover: rgba(20, 28, 45, 0.95);
+
+  /* Hazard Colors */
+  --color-fire: #ef4444;
+  --color-smoke: #9ca3af;
+  --color-flood: #06b6d4;
+  --color-debris: #f59e0b;
+  --color-landslide: #84cc16;
+  --color-person: #a855f7;
+
+  /* Priorities */
+  --color-prio-high: #f43f5e;
+  --color-prio-medium: #fbbf24;
+  --color-prio-low: #38bdf8;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: #e2e8f0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Tactical Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(6, 9, 17, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(30, 41, 59, 0.9);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(51, 65, 85, 1);
+}
+
+/* High Density Panel System */
+.tactical-panel {
+  background: var(--color-panel);
+  border: 1px solid var(--color-panel-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.tactical-panel-header {
+  background: rgba(15, 23, 42, 0.8);
+  border-bottom: 1px solid var(--color-panel-border);
+  padding: 8px 12px;
+}
+
+/* Flashing Emergency Highlight */
+.critical-alert-glow {
+  animation: critical-pulse 1.5s infinite alternate;
+}
+
+@keyframes critical-pulse {
+  from {
+    border-color: rgba(244, 63, 94, 0.5);
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.2);
+  }
+  to {
+    border-color: rgba(244, 63, 94, 1);
+    box-shadow: 0 0 16px rgba(244, 63, 94, 0.6);
+  }
+}
+
+/* Leaflet Map Overrides for Tactical Console */
+.leaflet-container {
+  background-color: #04060c !important;
+  font-family: var(--font-sans) !important;
+  border-radius: 4px;
+}
+
+.custom-map-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(6, 9, 17, 0.95);
+  border: 2px solid currentColor;
+  box-shadow: 0 0 10px currentColor;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.custom-map-marker:hover {
+  transform: scale(1.3);
+  z-index: 1000 !important;
+}
+
+.custom-map-marker.high-prio {
+  animation: marker-pulse 1.2s infinite alternate;
+}
+
+@keyframes marker-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); box-shadow: 0 0 16px currentColor; }
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(11, 16, 26, 0.95) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+  padding: 4px !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(11, 16, 26, 0.95) !important;
+}

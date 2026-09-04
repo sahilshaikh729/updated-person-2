@@ -42,14 +42,14 @@ export default function AllIncidentDataTable({
   });
 
   return (
-    <div className="tactical-panel bg-[#0a0e19] border border-slate-800/80 rounded font-sans text-slate-200">
+    <div className="tactical-panel bg-[#0c1017] border border-slate-800/90 rounded-sm font-sans text-slate-200 select-none">
       
       {/* Header & Controls Bar */}
-      <div className="p-3 border-b border-slate-800 flex items-center justify-between flex-wrap gap-3">
+      <div className="p-2.5 border-b border-slate-800 flex items-center justify-between flex-wrap gap-2.5">
         <div className="flex items-center gap-2">
-          <Table className="w-4 h-4 text-emerald-400" />
-          <h2 className="text-xs font-bold uppercase tracking-wider text-white">
-            ALL INCIDENT DATA ({events.length} TOTAL RECORDS)
+          <Table className="w-4 h-4 text-blue-400" />
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-100">
+            ALL INCIDENT RECORDS ({events.length} TOTAL)
           </h2>
         </div>
 
@@ -57,27 +57,27 @@ export default function AllIncidentDataTable({
         <div className="flex items-center gap-2 flex-wrap text-xs">
           
           {/* Status Filter Tabs */}
-          <div className="flex items-center bg-slate-900 p-0.5 rounded border border-slate-800 text-[11px]">
+          <div className="flex items-center bg-slate-900/80 p-0.5 rounded-sm border border-slate-800 text-[11px]">
             <button
               onClick={() => setStatusFilter('ALL')}
-              className={`px-2 py-0.5 rounded font-medium transition-all ${
-                statusFilter === 'ALL' ? 'bg-slate-700 text-white font-bold' : 'text-slate-400 hover:text-white'
+              className={`px-2 py-0.5 rounded-sm font-medium transition-colors ${
+                statusFilter === 'ALL' ? 'bg-slate-800 text-slate-100 font-semibold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               ALL ({events.length})
             </button>
             <button
               onClick={() => setStatusFilter('UNRESOLVED')}
-              className={`px-2 py-0.5 rounded font-medium transition-all ${
-                statusFilter === 'UNRESOLVED' ? 'bg-amber-950 text-amber-300 font-bold border border-amber-800/60' : 'text-slate-400 hover:text-white'
+              className={`px-2 py-0.5 rounded-sm font-medium transition-colors ${
+                statusFilter === 'UNRESOLVED' ? 'bg-amber-950/80 text-amber-200 font-semibold border border-amber-800/60' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               ACTIVE ({events.filter(e => e.status !== 'RESOLVED').length})
             </button>
             <button
               onClick={() => setStatusFilter('RESOLVED')}
-              className={`px-2 py-0.5 rounded font-medium transition-all ${
-                statusFilter === 'RESOLVED' ? 'bg-emerald-950 text-emerald-300 font-bold border border-emerald-800/60' : 'text-slate-400 hover:text-white'
+              className={`px-2 py-0.5 rounded-sm font-medium transition-colors ${
+                statusFilter === 'RESOLVED' ? 'bg-slate-800 text-slate-300 font-semibold border border-slate-700' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               RESOLVED ({events.filter(e => e.status === 'RESOLVED').length})
@@ -86,13 +86,13 @@ export default function AllIncidentDataTable({
 
           {/* Search Box */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1.5" />
             <input
               type="text"
               placeholder="Search ID, type, priority..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-slate-900 border border-slate-800 rounded pl-8 pr-3 py-1 text-[11px] text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-48"
+              className="bg-slate-900 border border-slate-800 rounded-sm pl-8 pr-2.5 py-1 text-[11px] text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-600 w-44"
             />
           </div>
 
@@ -100,26 +100,26 @@ export default function AllIncidentDataTable({
       </div>
 
       {/* Real Backend Data Table */}
-      <div className="overflow-x-auto max-h-[340px]">
+      <div className="overflow-x-auto max-h-[320px]">
         <table className="w-full text-left border-collapse text-xs font-sans">
-          <thead className="bg-slate-900/90 text-slate-400 text-[10px] uppercase font-bold sticky top-0 z-10 border-b border-slate-800">
+          <thead className="bg-[#111622] text-slate-400 text-[10px] uppercase font-semibold sticky top-0 z-10 border-b border-slate-800">
             <tr>
-              <th className="px-3 py-2">ID</th>
-              <th className="px-3 py-2">TYPE</th>
-              <th className="px-3 py-2">PRIORITY</th>
-              <th className="px-3 py-2">CONFIDENCE</th>
-              <th className="px-3 py-2">TIME</th>
-              <th className="px-3 py-2">LATITUDE</th>
-              <th className="px-3 py-2">LONGITUDE</th>
-              <th className="px-3 py-2">STATUS</th>
-              <th className="px-3 py-2 text-right">ACTION</th>
+              <th className="px-3 py-1.5">ID</th>
+              <th className="px-3 py-1.5">TYPE</th>
+              <th className="px-3 py-1.5">PRIORITY</th>
+              <th className="px-3 py-1.5">CONFIDENCE</th>
+              <th className="px-3 py-1.5">TIME</th>
+              <th className="px-3 py-1.5">LATITUDE</th>
+              <th className="px-3 py-1.5">LONGITUDE</th>
+              <th className="px-3 py-1.5">STATUS</th>
+              <th className="px-3 py-1.5 text-right">ACTION</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/60">
             {filteredEvents.length === 0 ? (
               <tr>
-                <td colSpan="9" className="text-center py-6 text-slate-500 text-xs italic">
-                  No incident data matches your filters.
+                <td colSpan="9" className="text-center py-5 text-slate-500 text-xs italic">
+                  No incident records match criteria.
                 </td>
               </tr>
             ) : (
@@ -127,7 +127,6 @@ export default function AllIncidentDataTable({
                 const isSelected = selectedEvent && selectedEvent.event_id === evt.event_id;
                 const isResolved = evt.status === 'RESOLVED';
                 const Icon = getHazardIcon(evt.hazard);
-                const hazardCfg = getHazardConfig(evt.hazard);
                 const confPct = Math.round((evt.confidence || 0) * 100);
                 const timeStr = evt.timestamp 
                   ? new Date(evt.timestamp).toLocaleTimeString() 
@@ -139,78 +138,78 @@ export default function AllIncidentDataTable({
                     onClick={() => onSelectEvent(evt)}
                     className={`transition-colors cursor-pointer text-[11px] ${
                       isSelected
-                        ? 'bg-amber-950/40 border-amber-500/50 text-white font-semibold'
+                        ? 'bg-slate-800/90 text-slate-100 font-medium'
                         : isResolved
                           ? 'bg-slate-950/40 text-slate-400 hover:bg-slate-900/60'
-                          : 'hover:bg-slate-900/70 text-slate-200'
+                          : 'hover:bg-slate-900/60 text-slate-300'
                     }`}
                   >
                     {/* ID */}
-                    <td className="px-3 py-2 font-mono font-bold text-slate-200">
+                    <td className="px-3 py-1.5 font-mono font-semibold text-slate-200">
                       {evt.event_id}
                     </td>
 
                     {/* TYPE */}
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-1.5 font-bold" style={{ color: hazardCfg.color }}>
-                        <Icon className="w-3.5 h-3.5" />
+                    <td className="px-3 py-1.5">
+                      <div className="flex items-center gap-1.5 font-medium text-slate-300">
+                        <Icon className="w-3.5 h-3.5 text-slate-400" />
                         <span className="uppercase">{evt.hazard}</span>
                       </div>
                     </td>
 
                     {/* PRIORITY */}
-                    <td className="px-3 py-2">
-                      <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded uppercase ${
+                    <td className="px-3 py-1.5">
+                      <span className={`px-1.5 py-0.2 text-[9px] font-semibold rounded uppercase font-mono ${
                         evt.priority === 'HIGH' 
-                          ? 'bg-rose-950 text-rose-300 border border-rose-800/60' 
+                          ? 'bg-red-950 text-red-300 border border-red-800/60' 
                           : evt.priority === 'MEDIUM'
                             ? 'bg-amber-950 text-amber-300 border border-amber-800/60'
-                            : 'bg-emerald-950 text-emerald-300 border border-emerald-800/60'
+                            : 'bg-slate-800 text-slate-300 border border-slate-700'
                       }`}>
                         {evt.priority}
                       </span>
                     </td>
 
                     {/* CONFIDENCE */}
-                    <td className="px-3 py-2 font-mono font-bold text-emerald-400">
+                    <td className="px-3 py-1.5 font-mono text-slate-200 font-semibold">
                       {confPct}%
                     </td>
 
                     {/* TIME */}
-                    <td className="px-3 py-2 text-slate-300 font-mono">
+                    <td className="px-3 py-1.5 text-slate-300 font-mono">
                       {timeStr}
                     </td>
 
                     {/* LATITUDE */}
-                    <td className="px-3 py-2 font-mono text-slate-300">
+                    <td className="px-3 py-1.5 font-mono text-slate-300">
                       {evt.latitude?.toFixed(5)}°
                     </td>
 
                     {/* LONGITUDE */}
-                    <td className="px-3 py-2 font-mono text-slate-300">
+                    <td className="px-3 py-1.5 font-mono text-slate-300">
                       {evt.longitude?.toFixed(5)}°
                     </td>
 
                     {/* STATUS */}
-                    <td className="px-3 py-2">
-                      <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded uppercase ${
+                    <td className="px-3 py-1.5">
+                      <span className={`px-1.5 py-0.2 text-[9px] font-semibold rounded uppercase ${
                         isResolved
                           ? 'bg-slate-900 text-slate-500 border border-slate-800'
-                          : 'bg-amber-950 text-amber-400 border border-amber-800/60 animate-pulse'
+                          : 'bg-amber-950/80 text-amber-300 border border-amber-800/60'
                       }`}>
                         {evt.status || 'UNRESOLVED'}
                       </span>
                     </td>
 
                     {/* ACTION */}
-                    <td className="px-3 py-2 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                    <td className="px-3 py-1.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onInspectEvidence(evt);
                           }}
-                          className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-semibold border border-slate-700 cursor-pointer"
+                          className="px-2 py-0.5 rounded-sm bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-medium border border-slate-700 cursor-pointer"
                         >
                           EVIDENCE
                         </button>
@@ -221,7 +220,7 @@ export default function AllIncidentDataTable({
                               e.stopPropagation();
                               onResolveEvent(evt.event_id);
                             }}
-                            className="px-2 py-0.5 rounded bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-bold border border-emerald-600 cursor-pointer"
+                            className="px-2 py-0.5 rounded-sm bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-medium border border-emerald-600 cursor-pointer"
                           >
                             RESOLVE
                           </button>

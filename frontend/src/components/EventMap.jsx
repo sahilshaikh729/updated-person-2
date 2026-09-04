@@ -226,24 +226,24 @@ export default function EventMap({
   }
 
   return (
-    <div className="tactical-panel flex flex-col h-full relative overflow-hidden bg-[#080b13] border border-slate-800/80 font-sans">
+    <div className="tactical-panel flex flex-col h-full relative overflow-hidden bg-[#080b13] border border-slate-800/90 font-sans select-none rounded-sm">
       
       {/* Map Panel Header */}
       <div className="tactical-panel-header flex items-center justify-between font-sans flex-wrap gap-2 py-1.5 px-3 bg-[#0c101c] border-b border-slate-800">
         <div className="flex items-center gap-2 flex-wrap">
-          <MapPin className="w-4 h-4 text-emerald-400" />
-          <h2 className="text-xs font-bold uppercase tracking-wider text-white">
+          <MapPin className="w-4 h-4 text-blue-400" />
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-100">
             LIVE MISSION MAP
           </h2>
 
           {/* Active Filter Indicator Badge */}
           {mapFilter && mapFilter !== 'ALL' && (
-            <div className="flex items-center gap-1 bg-amber-950/80 border border-amber-600/60 px-2 py-0.5 rounded text-[10px] font-bold text-amber-300">
+            <div className="flex items-center gap-1 bg-slate-800/90 border border-slate-700 px-2 py-0.5 rounded-sm text-[10px] font-medium text-slate-200">
               <span>FILTER: {mapFilter === 'SINGLE_EVENT' ? `ISOLATED (${selectedEvent?.event_id || 'EVENT'})` : mapFilter.toUpperCase()}</span>
               {onClearFilter && (
                 <button
                   onClick={onClearFilter}
-                  className="ml-1 text-amber-400 hover:text-white underline cursor-pointer"
+                  className="ml-1 text-blue-400 hover:text-white underline cursor-pointer"
                 >
                   [ SHOW ALL ]
                 </button>
@@ -252,8 +252,8 @@ export default function EventMap({
           )}
 
           {mapFilter === 'ALL' && (
-            <span className="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-2 py-0.5 rounded font-semibold">
-              SHOWING ALL ACTIVE ({filteredEvents.length})
+            <span className="text-[10px] text-slate-300 bg-slate-900/90 border border-slate-800 px-2 py-0.5 rounded-sm font-mono">
+              ALL ACTIVE ({filteredEvents.length})
             </span>
           )}
         </div>
@@ -262,35 +262,35 @@ export default function EventMap({
         <div className="flex items-center gap-3">
           
           {/* Tactical Layer Switcher: [ MAP ] [ SATELLITE ] */}
-          <div className="flex items-center bg-slate-950 p-0.5 rounded border border-slate-800 text-[10px] font-sans">
+          <div className="flex items-center bg-slate-950 p-0.5 rounded-sm border border-slate-800 text-[10px] font-sans">
             <button
               onClick={() => setMapViewMode('MAP')}
-              className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+              className={`px-2 py-0.5 rounded-sm font-medium transition-colors flex items-center gap-1 ${
                 mapViewMode === 'MAP'
-                  ? 'bg-cyan-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-slate-800 text-slate-100 font-semibold'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Globe className="w-3 h-3" /> MAP
+              <Globe className="w-3 h-3 text-slate-400" /> MAP
             </button>
             <button
               onClick={() => setMapViewMode('SATELLITE')}
-              className={`px-2 py-0.5 rounded font-bold transition-all flex items-center gap-1 ${
+              className={`px-2 py-0.5 rounded-sm font-medium transition-colors flex items-center gap-1 ${
                 mapViewMode === 'SATELLITE'
-                  ? 'bg-amber-500 text-black shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-slate-800 text-slate-100 font-semibold'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Image className="w-3 h-3" /> SATELLITE
+              <Image className="w-3 h-3 text-slate-400" /> SATELLITE
             </button>
           </div>
 
           {/* Map Legend */}
-          <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-400 font-sans">
-            <span className="flex items-center gap-1 text-blue-400 font-bold">
+          <div className="hidden sm:flex items-center gap-3 text-[10px] text-slate-400 font-sans">
+            <span className="flex items-center gap-1 text-slate-300 font-medium">
               🚁 DRONE
             </span>
-            <span className="flex items-center gap-1 text-emerald-400 font-bold">
+            <span className="flex items-center gap-1 text-red-400 font-medium">
               👤 PERSON
             </span>
           </div>

@@ -159,7 +159,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#080b13] text-slate-100 font-sans selection:bg-emerald-500 selection:text-black">
+    <div className="min-h-screen flex bg-[#090d16] text-slate-100 font-sans selection:bg-blue-600 selection:text-white">
       
       {/* Compact Sidebar Navigation */}
       <Sidebar 

@@ -67,28 +67,48 @@ export default function EvidenceModal({ event, onClose, onUpdateStatus }) {
         {/* Modal Body Grid */}
         <div className="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-800">
           
-          {/* Left Column: Optical Image Evidence Frame */}
+          {/* Left Column: Optical Image Evidence Frame or Evidence Unavailable State */}
           <div className="lg:col-span-2 p-6 flex flex-col justify-center items-center bg-slate-950/80 relative">
-            <div className="w-full h-full min-h-[380px] max-h-[500px] flex items-center justify-center rounded-xl overflow-hidden border border-slate-800 bg-black shadow-inner relative group">
-              <img
-                src={event.image_path}
-                alt={`Evidence artifact for ${event.event_id}`}
-                className="w-full h-full object-contain"
-              />
+            {event.image_path ? (
+              <div className="w-full h-full min-h-[380px] max-h-[500px] flex items-center justify-center rounded-xl overflow-hidden border border-slate-800 bg-black shadow-inner relative group">
+                <img
+                  src={event.image_path}
+                  alt={`Evidence artifact for ${event.event_id}`}
+                  className="w-full h-full object-contain"
+                />
 
-              <a
-                href={event.image_path}
-                target="_blank"
-                rel="noreferrer"
-                download={`EVIDENCE-${event.event_id}.jpg`}
-                className="absolute top-4 right-4 p-2.5 rounded-lg bg-slate-900/90 hover:bg-cyan-600 text-slate-300 hover:text-white border border-slate-700 transition-all font-mono text-xs flex items-center gap-1.5 shadow-lg"
-              >
-                <Download className="w-4 h-4" /> EXPORT FULL RES
-              </a>
-            </div>
+                <a
+                  href={event.image_path}
+                  target="_blank"
+                  rel="noreferrer"
+                  download={`EVIDENCE-${event.event_id}.jpg`}
+                  className="absolute top-4 right-4 p-2.5 rounded-lg bg-slate-900/90 hover:bg-cyan-600 text-slate-300 hover:text-white border border-slate-700 transition-all font-mono text-xs flex items-center gap-1.5 shadow-lg"
+                >
+                  <Download className="w-4 h-4" /> EXPORT FULL RES
+                </a>
+              </div>
+            ) : (
+              <div className="w-full h-full min-h-[380px] flex flex-col items-center justify-center p-8 rounded-xl border border-slate-800 bg-slate-950 text-center space-y-3">
+                <div className="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500">
+                  <AlertCircle className="w-8 h-8 opacity-60 text-amber-400" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+                  EVIDENCE UNAVAILABLE
+                </h3>
+                <p className="text-xs text-slate-400 max-w-sm font-mono">
+                  No optical image payload was attached to telemetry packet for event <span className="text-amber-300 font-bold">{event.event_id}</span>.
+                </p>
+                <div className="p-3 rounded bg-slate-900 border border-slate-800/80 text-[11px] text-slate-400 font-mono space-y-1 text-left max-w-sm w-full">
+                  <div><strong>Hazard:</strong> {event.hazard?.toUpperCase()}</div>
+                  <div><strong>Coordinates:</strong> {event.latitude?.toFixed(5)}°, {event.longitude?.toFixed(5)}°</div>
+                  <div><strong>Channel:</strong> {event.channel || 'WIFI'}</div>
+                  <div><strong>Ingest Time:</strong> {new Date(event.timestamp).toLocaleString()}</div>
+                </div>
+              </div>
+            )}
 
             <div className="w-full mt-3 flex items-center justify-between text-xs font-mono text-slate-400 px-1">
-              <span>PATH: {event.image_path}</span>
+              <span>IMAGE PATH: {event.image_path || 'NULL (TELEMETRY ONLY)'}</span>
               <span>TIMESTAMP: {new Date(event.timestamp).toLocaleString()}</span>
             </div>
           </div>

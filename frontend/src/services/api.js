@@ -76,3 +76,6 @@ export async function sendMockEvent(hazard = null, channel = 'WIFI') {
   if (!res.ok) throw new Error(`Mock trigger failed: ${res.statusText}`);
   return await res.json();
 }
+
+
+

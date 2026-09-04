@@ -55,8 +55,7 @@ function generateMockEvent(forcedHazard = null, channel = 'WIFI') {
         longitude: lng,
         altitude: alt,
         timestamp: timestamp,
-        channel: channel,
-        image_path: `events/${eventId}/image.jpg` // Person 1 contract format
+        channel: channel
     };
 }
 

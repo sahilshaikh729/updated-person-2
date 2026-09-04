@@ -1,191 +1,242 @@
-import React from 'react';
-import { Search, Eye, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Eye, Clock, User, Flame, Waves, Wind, Mountain, Package, ShieldCheck, Filter } from 'lucide-react';
 import { getHazardConfig, PRIORITY_CONFIG } from '../utils/hazardUtils';
 
+function getHazardIcon(hazard) {
+  const h = (hazard || '').toLowerCase();
+  switch (h) {
+    case 'person': return User;
+    case 'fire': return Flame;
+    case 'flood': return Waves;
+    case 'smoke': return Wind;
+    case 'landslide': return Mountain;
+    case 'debris': return Package;
+    default: return Filter;
+  }
+}
+
 export default function EventFeed({ 
-  events, 
-  filters, 
+  events = [], 
+  filters = {}, 
   setFilters, 
   onSelectEvent, 
-  onAcknowledgeStatus 
+  onInspectEvidence,
+  onFocusOnMap 
 }) {
+  const [activeCategory, setActiveCategory] = useState(filters.hazard || 'person');
+
+  const categories = [
+    { id: 'person', label: 'PERSON', icon: User, color: 'text-emerald-400', activeBg: 'bg-emerald-950/80 border-emerald-500/60 text-emerald-300' },
+    { id: 'fire', label: 'FIRE', icon: Flame, color: 'text-amber-500', activeBg: 'bg-amber-950/80 border-amber-500/60 text-amber-300' },
+    { id: 'flood', label: 'FLOOD', icon: Waves, color: 'text-blue-400', activeBg: 'bg-blue-950/80 border-blue-500/60 text-blue-300' },
+    { id: 'smoke', label: 'SMOKE', icon: Wind, color: 'text-slate-400', activeBg: 'bg-slate-900 border-slate-700 text-slate-200' },
+    { id: 'landslide', label: 'LANDSLIDE', icon: Mountain, color: 'text-orange-400', activeBg: 'bg-orange-950/80 border-orange-500/60 text-orange-300' },
+    { id: 'debris', label: 'DEBRIS', icon: Package, color: 'text-yellow-600', activeBg: 'bg-yellow-950/80 border-yellow-500/60 text-yellow-300' },
+    { id: '', label: 'ALL HAZARDS', icon: Filter, color: 'text-slate-400', activeBg: 'bg-slate-800 text-white border-slate-600' }
+  ];
+
+  // Filter events by selected category (including BOTH active and resolved)
+  const categoryEvents = events.filter((evt) => {
+    const hazardMatch = !activeCategory || (evt.hazard || '').toLowerCase() === activeCategory.toLowerCase();
+    const searchMatch = !filters.search || 
+      evt.event_id.toLowerCase().includes(filters.search.toLowerCase()) ||
+      (evt.hazard || '').toLowerCase().includes(filters.search.toLowerCase());
+    return hazardMatch && searchMatch;
+  });
+
+  const getCategoryCount = (catId) => {
+    if (!catId) return events.length;
+    return events.filter(e => (e.hazard || '').toLowerCase() === catId.toLowerCase()).length;
+  };
+
   return (
-    <div className="tactical-panel flex flex-col h-full font-sans">
+    <div className="tactical-panel flex flex-col h-full font-sans bg-[#0a0e19] border border-slate-800/80 rounded p-3">
       
-      {/* Table Header & Controls Bar */}
-      <div className="tactical-panel-header flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 font-mono">
-        
-        <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-cyan-400" />
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-            RECENT INCIDENTS & TELEMETRY STREAM
-          </h2>
-          <span className="text-[10px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800 font-bold">
-            {events.length} RECORDS
-          </span>
-        </div>
-
-        {/* Filter Controls Toolbar */}
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          
-          {/* Search Input */}
-          <div className="relative flex-1 sm:w-40">
-            <Search className="w-3.5 h-3.5 absolute left-2 top-2 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search ID/Notes..."
-              value={filters.search || ''}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 rounded pl-7 pr-2 py-1 text-slate-200 text-[11px] focus:outline-none focus:border-cyan-500"
-            />
+      {/* Header Bar */}
+      <div className="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2">
+        <div>
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-sm font-bold uppercase tracking-wider text-white font-sans">
+              DETECTION CATEGORY HISTORY & AUDIT REVIEW
+            </h2>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 font-mono">
+              {categoryEvents.length} TOTAL (ACTIVE + RESOLVED)
+            </span>
           </div>
-
-          {/* Hazard Filter */}
-          <select
-            value={filters.hazard || ''}
-            onChange={(e) => setFilters({ ...filters, hazard: e.target.value })}
-            className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-[11px] focus:outline-none focus:border-cyan-500"
-          >
-            <option value="">ALL HAZARDS</option>
-            <option value="fire">FIRE</option>
-            <option value="smoke">SMOKE</option>
-            <option value="flood">FLOOD</option>
-            <option value="debris">DEBRIS</option>
-            <option value="landslide">LANDSLIDE</option>
-            <option value="person">PERSON</option>
-          </select>
-
-          {/* Priority Filter */}
-          <select
-            value={filters.priority || ''}
-            onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-            className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-[11px] focus:outline-none focus:border-cyan-500"
-          >
-            <option value="">ALL PRIORITIES</option>
-            <option value="HIGH">HIGH ONLY</option>
-            <option value="MEDIUM">MEDIUM ONLY</option>
-            <option value="LOW">LOW ONLY</option>
-          </select>
-
-          {/* Channel Filter */}
-          <select
-            value={filters.channel || ''}
-            onChange={(e) => setFilters({ ...filters, channel: e.target.value })}
-            className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-[11px] focus:outline-none focus:border-cyan-500"
-          >
-            <option value="">ALL CHANNELS</option>
-            <option value="WIFI">WI-FI</option>
-            <option value="LORA">LORA</option>
-          </select>
-
+          <p className="text-[11px] text-slate-400 font-sans mt-0.5">
+            Complete incident log per category. Resolved detections remain preserved for audit compliance.
+          </p>
         </div>
 
+        {/* Search Input */}
+        <div className="relative w-full sm:w-56">
+          <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-500" />
+          <input
+            type="text"
+            placeholder="Search Event ID or notes..."
+            value={filters.search || ''}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            className="w-full bg-slate-950 border border-slate-800 rounded pl-8 pr-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-emerald-500 font-sans"
+          />
+        </div>
       </div>
 
-      {/* Incident Feed Table */}
-      <div className="flex-1 overflow-y-auto min-h-[160px] max-h-[260px]">
-        <table className="w-full text-left font-mono border-collapse">
-          <thead className="sticky top-0 bg-[#090d18] border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider z-20">
+      {/* Category Selection Tabs Bar (PERSON first) */}
+      <div className="flex items-center gap-1.5 py-2.5 overflow-x-auto border-b border-slate-800/80">
+        {categories.map((cat) => {
+          const Icon = cat.icon;
+          const isActive = activeCategory === cat.id;
+          const count = getCategoryCount(cat.id);
+
+          return (
+            <button
+              key={cat.id || 'all'}
+              onClick={() => {
+                setActiveCategory(cat.id);
+                setFilters({ ...filters, hazard: cat.id });
+              }}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded border text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                isActive
+                  ? cat.activeBg + ' shadow-sm'
+                  : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+            >
+              <Icon className={`w-3.5 h-3.5 ${cat.color}`} />
+              <span>{cat.label}</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-950 border border-slate-800 font-mono text-slate-300">
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Incident History Review Table */}
+      <div className="flex-1 overflow-y-auto mt-2 min-h-[350px]">
+        <table className="w-full text-left font-sans border-collapse text-xs">
+          <thead className="sticky top-0 bg-[#090d18] border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider z-10 font-mono">
             <tr>
-              <th className="py-2 px-3">HAZARD / ID</th>
-              <th className="py-2 px-3">PRIORITY</th>
-              <th className="py-2 px-3">CONFIDENCE</th>
-              <th className="py-2 px-3">COORDINATES & ALT</th>
-              <th className="py-2 px-3">TIME</th>
-              <th className="py-2 px-3">CHANNEL</th>
-              <th className="py-2 px-3">STATUS</th>
-              <th className="py-2 px-3 text-right">ACTION</th>
+              <th className="py-2.5 px-3">EVENT ID</th>
+              <th className="py-2.5 px-3">HAZARD TYPE</th>
+              <th className="py-2.5 px-3">CONFIDENCE</th>
+              <th className="py-2.5 px-3">PRIORITY</th>
+              <th className="py-2.5 px-3">TIMESTAMP</th>
+              <th className="py-2.5 px-3">LATITUDE</th>
+              <th className="py-2.5 px-3">LONGITUDE</th>
+              <th className="py-2.5 px-3">STATUS</th>
+              <th className="py-2.5 px-3">EVIDENCE</th>
+              <th className="py-2.5 px-3 text-right">ACTION</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 text-[11px]">
-            {events.length === 0 ? (
+          <tbody className="divide-y divide-slate-800/60 font-sans text-xs">
+            {categoryEvents.length === 0 ? (
               <tr>
-                <td colSpan="8" className="py-8 text-center text-slate-500 italic">
-                  No detection events matching current criteria.
+                <td colSpan="10" className="py-12 text-center text-slate-500 italic">
+                  No detection records found for category "{activeCategory || 'ALL'}".
                 </td>
               </tr>
             ) : (
-              events.map((evt) => {
+              categoryEvents.map((evt) => {
                 const hazardCfg = getHazardConfig(evt.hazard);
                 const prioCfg = PRIORITY_CONFIG[evt.priority] || PRIORITY_CONFIG.LOW;
-                const HazardIcon = hazardCfg.icon;
-                const isHigh = evt.priority === 'HIGH';
-                const formattedTime = new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const Icon = getHazardIcon(evt.hazard);
+                const confPct = Math.round((evt.confidence || 0) * 100);
+                const isResolved = evt.status === 'RESOLVED';
+                const formattedTime = new Date(evt.timestamp).toLocaleString();
 
                 return (
                   <tr 
                     key={evt.event_id}
-                    className={`hover:bg-slate-800/40 transition-colors ${
-                      isHigh ? 'bg-rose-950/15 border-l-2 border-l-rose-500' : ''
+                    onClick={() => onSelectEvent && onSelectEvent(evt)}
+                    className={`hover:bg-slate-900/80 transition-colors cursor-pointer ${
+                      isResolved ? 'opacity-70 bg-slate-950/40' : 'bg-slate-900/30'
                     }`}
                   >
                     
-                    {/* Hazard & Event ID */}
-                    <td className="py-2 px-3">
-                      <div className="flex items-center gap-1.5">
-                        <HazardIcon className="w-3.5 h-3.5" style={{ color: hazardCfg.color }} />
-                        <span className="font-bold text-white uppercase" style={{ color: hazardCfg.color }}>
-                          {hazardCfg.label.split(' ')[0]}
-                        </span>
-                        <span className="text-slate-500 text-[10px]">({evt.event_id})</span>
+                    {/* Event ID */}
+                    <td className="py-2.5 px-3 font-mono font-bold text-slate-200">
+                      {evt.event_id}
+                    </td>
+
+                    {/* Hazard Type */}
+                    <td className="py-2.5 px-3">
+                      <div className="flex items-center gap-1.5 font-bold uppercase" style={{ color: hazardCfg.color }}>
+                        <Icon className="w-3.5 h-3.5" />
+                        <span>{evt.hazard}</span>
                       </div>
                     </td>
 
+                    {/* Confidence */}
+                    <td className="py-2.5 px-3 font-mono font-bold text-emerald-400">
+                      {confPct}% Match
+                    </td>
+
                     {/* Priority */}
-                    <td className="py-2 px-3">
-                      <span 
-                        className="px-1.5 py-0.5 rounded text-[9px] font-bold inline-flex items-center gap-1"
-                        style={{ backgroundColor: prioCfg.bg, color: prioCfg.color }}
-                      >
-                        {isHigh && <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>}
+                    <td className="py-2.5 px-3">
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                        evt.priority === 'HIGH' 
+                          ? 'bg-rose-950 text-rose-300 border border-rose-800/60' 
+                          : evt.priority === 'MEDIUM'
+                            ? 'bg-amber-950 text-amber-300 border border-amber-800/60'
+                            : 'bg-emerald-950 text-emerald-300 border border-emerald-800/60'
+                      }`}>
                         {evt.priority}
                       </span>
                     </td>
 
-                    {/* Confidence */}
-                    <td className="py-2 px-3 font-bold text-emerald-400">
-                      {(evt.confidence * 100).toFixed(0)}%
-                    </td>
-
-                    {/* Coordinates */}
-                    <td className="py-2 px-3 text-slate-300 font-mono text-[10px]">
-                      {evt.latitude.toFixed(4)}°, {evt.longitude.toFixed(4)}° ({evt.altitude}m)
-                    </td>
-
                     {/* Timestamp */}
-                    <td className="py-2 px-3 text-slate-400 text-[10px] whitespace-nowrap">
+                    <td className="py-2.5 px-3 text-slate-300 font-mono text-[11px]">
                       {formattedTime}
                     </td>
 
-                    {/* Channel */}
-                    <td className="py-2 px-3">
-                      <span className={`text-[10px] font-bold ${evt.channel === 'LORA' ? 'text-amber-400' : 'text-cyan-400'}`}>
-                        {evt.channel}
-                      </span>
+                    {/* Latitude */}
+                    <td className="py-2.5 px-3 text-slate-300 font-mono">
+                      {evt.latitude?.toFixed(5)}°
+                    </td>
+
+                    {/* Longitude */}
+                    <td className="py-2.5 px-3 text-slate-300 font-mono">
+                      {evt.longitude?.toFixed(5)}°
                     </td>
 
                     {/* Status */}
-                    <td className="py-2 px-3">
-                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold ${
-                        evt.status === 'RESOLVED' 
-                          ? 'bg-emerald-950 border border-emerald-500/40 text-emerald-400' 
-                          : evt.status === 'ACKNOWLEDGED'
-                          ? 'bg-amber-950 border border-amber-500/40 text-amber-300'
-                          : 'bg-rose-950 border border-rose-500/40 text-rose-300'
+                    <td className="py-2.5 px-3">
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                        isResolved
+                          ? 'bg-slate-900 text-slate-500 border border-slate-800'
+                          : 'bg-amber-950 text-amber-300 border border-amber-800/60 animate-pulse'
                       }`}>
-                        {evt.status}
+                        {evt.status || 'UNRESOLVED'}
                       </span>
                     </td>
 
-                    {/* Action */}
-                    <td className="py-2 px-3 text-right">
-                      <button
-                        onClick={() => onSelectEvent(evt)}
-                        className="px-2 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-slate-300 hover:text-white transition-all text-[10px] cursor-pointer inline-flex items-center gap-1"
-                      >
-                        <Eye className="w-3 h-3" />
-                        <span>EVIDENCE</span>
-                      </button>
+                    {/* Evidence Attachment State */}
+                    <td className="py-2.5 px-3">
+                      {evt.image_path ? (
+                        <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-800/50 px-1.5 py-0.5 rounded">
+                          IMAGE ATTACHED
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-500 font-medium bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded">
+                          TELEMETRY ONLY
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Action Buttons */}
+                    <td className="py-2.5 px-3 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onSelectEvent) onSelectEvent(evt);
+                          }}
+                          className="px-2.5 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] transition-all cursor-pointer flex items-center gap-1"
+                        >
+                          <Eye className="w-3 h-3" /> MAP FOCUS
+                        </button>
+                      </div>
                     </td>
 
                   </tr>
@@ -199,3 +250,4 @@ export default function EventFeed({
     </div>
   );
 }
+

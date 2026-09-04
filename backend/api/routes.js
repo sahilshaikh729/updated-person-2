@@ -7,7 +7,6 @@ const multer = require('multer');
 const eventModel = require('../models/eventModel');
 const { validateWiFiEvent, validateLoRaEvent } = require('./middleware');
 const { broadcast, getConnectedClientCount } = require('../services/websocketService');
-const { ensureEventEvidence } = require('../services/mockEvidenceService');
 
 // Multer storage configuration for RPi image uploads
 const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, '../uploads');
@@ -84,14 +83,6 @@ router.post('/events', upload.single('image'), validateWiFiEvent, async (req, re
         // Idempotent upsert (create or merge with existing LoRa event)
         const updatedEvent = await eventModel.upsertEvent(payload);
 
-        // Ensure evidence image URL exists (generate mock SVG overlay if no image uploaded)
-        if (!updatedEvent.image_path) {
-            const generatedPath = ensureEventEvidence(updatedEvent);
-            if (generatedPath) {
-                updatedEvent.image_path = generatedPath;
-            }
-        }
-
         // Broadcast real-time update over WebSocket to all Ground Station clients
         broadcast('EVENT_CREATED', updatedEvent);
 
@@ -115,14 +106,6 @@ router.post('/events/lora', validateLoRaEvent, async (req, res, next) => {
 
         // Idempotent upsert (create or update telemetry without overwriting existing Wi-Fi image)
         const updatedEvent = await eventModel.upsertEvent(payload);
-
-        // Ensure fallback SVG evidence for display if no real image attached
-        if (!updatedEvent.image_path) {
-            const generatedPath = ensureEventEvidence(updatedEvent);
-            if (generatedPath) {
-                updatedEvent.image_path = generatedPath;
-            }
-        }
 
         // Broadcast real-time update
         broadcast('EVENT_CREATED', updatedEvent);
@@ -196,13 +179,6 @@ router.get('/events', async (req, res, next) => {
             offset: offset ? parseInt(offset, 10) : 0
         });
 
-        // Ensure all returned events have evidence path
-        result.events.forEach(evt => {
-            if (!evt.image_path) {
-                evt.image_path = ensureEventEvidence(evt);
-            }
-        });
-
         res.json(result);
     } catch (err) {
         next(err);
@@ -223,10 +199,6 @@ router.get('/events/:event_id', async (req, res, next) => {
                 error: 'EVENT_NOT_FOUND',
                 message: `Event with ID '${eventId}' was not found.`
             });
-        }
-
-        if (!event.image_path) {
-            event.image_path = ensureEventEvidence(event);
         }
 
         res.json(event);
@@ -272,5 +244,7 @@ router.patch('/events/:event_id/status', async (req, res, next) => {
         next(err);
     }
 });
+
+
 
 module.exports = router;
